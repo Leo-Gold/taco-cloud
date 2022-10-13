@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import tacos.Data.Ingredient;
 import tacos.Data.Type;
@@ -19,6 +22,7 @@ import tacos.Data.TacoOrder;
 @SessionAttributes("tacoOrder")
 public class DesignTacoController {
 	private static final Logger log = LoggerFactory.getLogger(DesignTacoController.class);
+
 	@ModelAttribute
 	public void addIngredientsToModel(Model model) {
 		List<Ingredient> ingredients = Arrays.asList(new Ingredient("FLTO", "Flour Tortilla", Type.WRAP),
@@ -53,7 +57,10 @@ public class DesignTacoController {
 	}
 
 	@PostMapping
-	public String processTaco(Taco taco, @ModelAttribute TacoOrder tacoOrder) {
+	public String processTaco(@Valid Taco taco, Errors errors, @ModelAttribute TacoOrder tacoOrder) {
+		if (errors.hasErrors()) {
+			return "design";
+		}
 		tacoOrder.addTaco(taco);
 		log.info("Processing taco: {}", taco);
 		return "redirect:/orders/current";

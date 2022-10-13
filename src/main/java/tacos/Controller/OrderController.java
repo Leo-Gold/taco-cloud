@@ -1,8 +1,11 @@
 package tacos.Controller;
 
+import javax.validation.Valid;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,10 +26,14 @@ public class OrderController {
   }
 
   @PostMapping
-  public String processOrder(TacoOrder order, SessionStatus sessionStatus) {
-    log.info("Order submitted: {}", order);
-    sessionStatus.setComplete();
-    return "redirect:/";
+  public String processOrder(@Valid TacoOrder order, Errors errors,
+   SessionStatus sessionStatus) {
+   if (errors.hasErrors()) {
+   return "orderForm";
+   }
+   log.info("Order submitted: {}", order);
+   sessionStatus.setComplete();
+   return "redirect:/";
   }
 }
 
