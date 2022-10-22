@@ -1,15 +1,29 @@
-package tacos.Data;
+package tacos.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.CreditCardNumber;
 
-public class TacoOrder {
+@Entity
+public class TacoOrder implements Serializable {
+	private static final long serialVersionUID = 1L;
+	@Id
+	private Long id;
+
+	private Date createdAt;
+	private Date placedAt = new Date();
 	@NotBlank(message = "Delivery name is required")
 	private String deliveryName;
 	@NotBlank(message = "Street is required")
@@ -26,6 +40,7 @@ public class TacoOrder {
 	private String ccExpiration;
 	@Digits(integer = 3, fraction = 0, message = "Invalid CVV")
 	private String ccCVV;
+	@OneToMany(cascade = CascadeType.ALL)
 	private List<Taco> tacos = new ArrayList<>();
 
 	public void addTaco(Taco taco) {
@@ -33,6 +48,30 @@ public class TacoOrder {
 	}
 
 	public TacoOrder() {
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public Date getPlacedAt() {
+		return placedAt;
+	}
+
+	public void setPlacedAt(Date placedAt) {
+		this.placedAt = placedAt;
 	}
 
 	public String getDeliveryName() {
@@ -108,10 +147,15 @@ public class TacoOrder {
 	}
 
 	@Override
-	public String toString() {
-		return "TacoOrder [deliveryName=" + deliveryName + ", deliveryStreet=" + deliveryStreet + ", deliveryCity="
-				+ deliveryCity + ", deliveryState=" + deliveryState + ", deliveryZip=" + deliveryZip + ", ccNumber="
-				+ ccNumber + ", ccExpiration=" + ccExpiration + ", ccCVV=" + ccCVV + ", tacos=" + tacos + "]";
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		TacoOrder tacoOrder = (TacoOrder) o;
+		return Objects.equals(createdAt, tacoOrder.createdAt);
 	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(createdAt);
+	}
 }
